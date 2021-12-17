@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<document>
+    <page>
+        <page-0-top-article>Форма Ф-48</page-0-top-article>
+
+        <filling-form-central align="left">
+
+            <field>
+                <text>Подрядная организация_____________________________</text>
+            </field>
+            <field>
+                <text>__________________________________________________</text>
+            </field>
+            <field>
+                <text>Строительство(реконструкция)______________________</text>
+            </field>
+            <field>
+                <text>__________________________________________________</text>
+                <description>
+                    (наименование и месторасположение,
+                </description>
+            </field>
+            <field>
+                <text>__________________________________________________</text>
+                <description>
+                    км, ПК)
+                </description>
+            </field>
+
+        </filling-form-central>
+
+        <page-main-header>
+            <text-line><text>ЖУРНАЛ № ______ ИЗГОТОВЛЕНИЯ И ОСВИДЕТЕЛЬСТВОВАНИЯ</text></text-line>
+            <text-line><text>АРМАТУРНЫХ КАРКАСОВ ДЛЯ БЕТОНИРОВАНИЯ МОНОЛИТНЫХ И</text></text-line>
+            <text-line><text>СБОРНЫХ ЖЕЛЕЗОБЕТОННЫХ КОНСТРУКЦИЙ НА СТРОИТЕЛЬСТВЕ</text></text-line>
+            <text-line><text>(РЕКОНСТРУКЦИИ)</text></text-line>
+        </page-main-header>
+
+        <filling-form align="right">
+            <field>
+                <text>Начат   «___»______________ 20____ г.</text>
+            </field>
+            <field>
+                <text>Окончен «___»______________ 20____ г.</text>
+            </field>
+        </filling-form>
+
+    </page>
+</document>
