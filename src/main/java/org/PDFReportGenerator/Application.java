@@ -1,9 +1,6 @@
 package org.PDFReportGenerator;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
@@ -14,19 +11,17 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.PDFReportGenerator.configuration.spring.Main;
-import org.apache.fop.apps.FOPException;
-import org.apache.fop.apps.FOUserAgent;
-import org.apache.fop.apps.Fop;
-import org.apache.fop.apps.FopFactory;
-import org.apache.fop.apps.MimeConstants;
+import org.apache.fop.apps.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.Environment;
+import org.xml.sax.SAXException;
 
 public class Application {
 
     private static final String     inputXSLURI;
     private static final String     inputXMLURI;
     private static final String     outputURI;
+    private static final String     fopConfigURI;
 
     private static final Environment                            springMainEnvironment;
     private static final AnnotationConfigApplicationContext     springApplicationContext;
@@ -37,7 +32,7 @@ public class Application {
         inputXSLURI = springMainEnvironment.getProperty("inputXSLURI");
         inputXMLURI = springMainEnvironment.getProperty("inputXMLURI");
         outputURI = springMainEnvironment.getProperty("outputURI");
-        System.out.println(new File(".").toURI());
+        fopConfigURI = springMainEnvironment.getProperty("fopConfigURI");
     }
 
 
@@ -56,12 +51,23 @@ public class Application {
      * @throws TransformerException
      */
     private static void convertToPDF()  throws IOException, FOPException, TransformerException {
+
+        File fopConfigFile = new File(fopConfigURI);
+
         // the XSL FO file
         File xsltFile = new File(inputXSLURI);
         StreamSource xmlSource = new StreamSource(new File(inputXMLURI));
 
         // create an instance of fop factory
-        FopFactory fopFactory = FopFactory.newInstance(new File(".").toURI());
+        FopFactory fopFactory = null;
+        try {
+            fopFactory = FopFactory.newInstance(new File(".").toURI(), new FileInputStream(fopConfigFile));
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
         // a user agent is needed for transformation
         FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
         // Setup output
