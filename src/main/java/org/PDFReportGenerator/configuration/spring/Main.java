@@ -22,7 +22,7 @@ public class Main {
     @Autowired
     private Environment environment;
 
-    @Bean(name = "springMainEnvironment")
+    @Bean(name = "springApplicationMainEnvironment")
     public Environment environment(){
         return environment;
     }
