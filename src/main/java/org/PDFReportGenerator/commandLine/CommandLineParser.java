@@ -23,54 +23,65 @@ public class CommandLineParser {
     private final Parameter[] existingParameters;
 
     /**
+     * Фрагменты команндной строки, полученные вызывающим кодом.
+     */
+    private final String[] commandLineFragments;
+
+    /**
      * Указатель на текущий параметров. Используется для упрощения доступа к текущему параметру, при переборе массива значений,
      * полученного вызывающим кодом из командной строки.
      */
     private Parameter currentParameter;
 
-    public CommandLineParser(Parameter[] existingParameters) {
+    public CommandLineParser(Parameter[] existingParameters, String[] commandLineFragments) {
         this.existingParameters = existingParameters;
+        this.commandLineFragments = commandLineFragments;
     }
 
     /**
      * Назначением функции является проверка на правильность полученных вызывающим кодом параметров командной строки.
-     * @param commandLineParts
-     * Массив значений, полученных вызывающим кодов при вызове из командной строки.
      * @return
      * Возвращает Map, который содержит пары "параметр-группа значений".
      * @throws CommandLineArgumentsException
      */
-    public Map<Parameter, List<String>> parseCommandLineArguments(String[] commandLineParts) throws CommandLineArgumentsException {
+    public Map<Parameter, List<String>> parseCommandLineArguments() throws CommandLineArgumentsException {
         parsedCommandLineArguments = new LinkedHashMap<>();
-        if(commandLineParts[0].charAt(0) != '-') {
-            throw new CommandLineArgumentsException("Nameless arguments not allowed.");
-        }
-
-        for (int partCounter = 0; partCounter < commandLineParts.length; partCounter++) {
-            if (commandLineParts[partCounter].charAt(0) == '-') {
-                addNewParameter(commandLineParts[partCounter]);
-                if (commandLineParts[partCounter + 1].charAt(0) == '-' && !this.isCurrentParameterValuesCountAcceptable()){
-
-                    throw new CommandLineArgumentsException(
-                            String.format("Wrong values count for \"%s\". Expected : more than %d & less than %d. Received : %d.",
-                                    currentParameter.getName(), currentParameter.getMaximalCountOfValues(), currentParameter.getMinimalCountOfValues(), this.parsedCommandLineArguments.get(currentParameter).size()));
-                }
-            } else {
-                this.parsedCommandLineArguments.get(currentParameter).add(commandLineParts[partCounter]);
-                if ( (partCounter == commandLineParts.length - 1 || commandLineParts[partCounter + 1].charAt(0) == '-') && !this.isCurrentParameterValuesCountAcceptable()){
-
-                    throw new CommandLineArgumentsException(
-                            String.format("Wrong values count for \"%s\". Expected : more than %d & less than %d. Received : %d.",
-                                    currentParameter.getName(), currentParameter.getMaximalCountOfValues(), currentParameter.getMinimalCountOfValues(), this.parsedCommandLineArguments.get(currentParameter).size()));
-                }
+        checkStartingCommandLineFragment();
+        for (int commandLineFragmentCounter = 0; commandLineFragmentCounter < commandLineFragments.length;) {
+            commandLineFragmentCounter = parseCommandLineFragmentAsParameterAndGetNextIndex(commandLineFragmentCounter);
+            if (!this.isCurrentParameterValuesCountAcceptable()){
+                throw new CommandLineArgumentsException(String.format("Wrong values count for \"%s\". Expected : more or equal than %d & less or equal than %d. Received : %d.", currentParameter.getName(), currentParameter.getMaximalCountOfValues(), currentParameter.getMinimalCountOfValues(), this.parsedCommandLineArguments.get(currentParameter).size()));
             }
         }
-
         if (isMinimalParameterSet()){
             return parsedCommandLineArguments;
         }
+        throw new CommandLineArgumentsException("Insufficient parameter set.");
+    }
 
-        throw new CommandLineArgumentsException("Three argument required.");
+    public boolean isCommandLineFragmentAParameter(String commandLineFragment){
+        return commandLineFragment.charAt(0) == '-';
+    }
+
+    public void checkStartingCommandLineFragment() throws CommandLineArgumentsException {
+        if(!isCommandLineFragmentAParameter(commandLineFragments[0])) {
+            throw new CommandLineArgumentsException("Values without a parameter are not allowed.");
+        }
+    }
+
+    public int parseCommandLineFragmentAsParameterAndGetNextIndex(int fragmentIndex) throws CommandLineArgumentsException {
+        addNewParameter(commandLineFragments[fragmentIndex]);
+        for (int commandLineFragmentCounter = fragmentIndex + 1; commandLineFragmentCounter < commandLineFragments.length; commandLineFragmentCounter++){
+            if (isCommandLineFragmentAParameter(commandLineFragments[commandLineFragmentCounter])){
+                return commandLineFragmentCounter;
+            }
+            addValueToCurrentParameter(commandLineFragments[commandLineFragmentCounter]);
+        }
+        return commandLineFragments.length;
+    }
+
+    public void addValueToCurrentParameter(String value){
+        this.parsedCommandLineArguments.get(currentParameter).add(value);
     }
 
     /**

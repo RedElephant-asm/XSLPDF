@@ -10,20 +10,11 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
-
-//import com.itextpdf.text.pdf.PdfReader;
-//import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
-//import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
-//import com.itextpdf.text.pdf.parser.TextExtractionStrategy;
 import org.PDFReportGenerator.commandLine.CommandLineParser;
 import org.PDFReportGenerator.commandLine.Parameter;
 import org.PDFReportGenerator.configuration.spring.Main;
 import org.PDFReportGenerator.commandLine.throwable.CommandLineArgumentsException;
 import org.apache.fop.apps.*;
-//import org.apache.poi.xwpf.usermodel.BreakType;
-//import org.apache.poi.xwpf.usermodel.XWPFDocument;
-//import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-//import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.Environment;
 import org.xml.sax.SAXException;
@@ -43,7 +34,8 @@ public class Application {
                     new Parameter(1, 1, true, "IXU"),
                     new Parameter(1, 1, true, "OU"),
                     new Parameter(1, 3, false, "FCU"),
-                    new Parameter(1,1,false,"f")
+                    new Parameter(1, 1, false, "f"),
+                    new Parameter(0, 2, true, "EM")
             };
 
     private static final String inputXSLURI;
@@ -67,8 +59,8 @@ public class Application {
 
     public static void main(String[] args) throws CommandLineArgumentsException {
 
-        CommandLineParser commandLineParser = new CommandLineParser(commandLineParameters);
-        parameters = commandLineParser.parseCommandLineArguments(args);
+        CommandLineParser commandLineParser = new CommandLineParser(commandLineParameters, args);
+        parameters = commandLineParser.parseCommandLineArguments();
         for (Parameter parameter : parameters.keySet()) {
             System.out.printf("Parameter : %s, Values : %s\n", parameter.getName(), parameters.get(parameter));
         }
@@ -128,46 +120,5 @@ public class Application {
         } finally {
             out.close();
         }
-
-        if (parameters.get(commandLineParameters[4]).get(0).equalsIgnoreCase("docx")){
-//            PDFToDocX();
-        }
     }
-
-//    public static void PDFToDocX(){
-//        XWPFDocument doc = new XWPFDocument();
-//        String pdf = outputURI + "test1.pdf";
-//        PdfReader reader = null;
-//        try {
-//            reader = new PdfReader(pdf);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        PdfReaderContentParser parser = new PdfReaderContentParser(reader);
-//        for (int i = 1; i <= reader.getNumberOfPages(); i++) {
-//            TextExtractionStrategy strategy =
-//                    null;
-//            try {
-//                strategy = parser.processContent(i, new SimpleTextExtractionStrategy());
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            String text = strategy.getResultantText();
-//            XWPFParagraph p = doc.createParagraph();
-//            XWPFRun run = p.createRun();
-//            run.setText(text);
-//            run.addBreak(BreakType.PAGE);
-//        }
-//        FileOutputStream out = null;
-//        try {
-//            out = new FileOutputStream(outputURI + "test.docx");
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            doc.write(out);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 }
